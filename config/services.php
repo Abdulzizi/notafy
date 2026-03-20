@@ -35,4 +35,25 @@ return [
         ],
     ],
 
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
+
+    'mistral' => [
+        'key' => env('MISTRAL_API_KEY'),
+    ],
+
+    'mayar' => [
+        'webhook_secret'      => env('MAYAR_WEBHOOK_SECRET'),
+        'starter_payment_url' => env('MAYAR_STARTER_PAYMENT_URL'),
+        'pro_payment_url'     => env('MAYAR_PRO_PAYMENT_URL'),
+    ],
+
+    'adsense' => [
+        'client_id'    => env('ADSENSE_CLIENT_ID'),
+        'default_slot' => env('ADSENSE_DEFAULT_SLOT'),
+    ],
+
 ];
