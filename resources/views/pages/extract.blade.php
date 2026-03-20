@@ -1,6 +1,7 @@
 @extends('layouts.dashboard')
 
 @section('title', 'Extract Receipt')
+@section('description', 'Upload a receipt photo or PDF and get structured data extracted in seconds.')
 
 @section('content')
 <div class="extract-page">

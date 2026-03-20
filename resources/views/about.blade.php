@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'About')
+@section('description', 'Notafy reads your receipts so you don\'t have to. Built for Indonesian expense tracking.')
 
 @section('content')
     <div class="about-page">

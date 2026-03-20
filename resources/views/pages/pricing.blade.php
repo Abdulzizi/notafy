@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Pricing')
+@section('description', 'Simple credit-based pricing. Start free with 10 credits per week. Buy more anytime.')
 
 @section('content')
 <div class="pricing-page">

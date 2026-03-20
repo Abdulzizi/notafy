@@ -4,7 +4,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title') &mdash; Notafy — OCR Nota Otomatis</title>
+    <title>@yield('title', 'Notafy') &mdash; Extract receipts instantly</title>
+    <meta name="description" content="@yield('description', 'Notafy extracts structured data from any receipt photo or PDF using AI. Free to start.')">
+    <link rel="canonical" href="{{ url()->current() }}">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="@yield('title', 'Notafy') — Receipt OCR">
+    <meta property="og:description" content="@yield('description', 'Extract receipts instantly with AI.')">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:image" content="{{ asset('images/og-image.svg') }}">
+    <meta property="og:site_name" content="Notafy">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@yield('title', 'Notafy')">
+    <meta name="twitter:description" content="@yield('description', 'Extract receipts instantly with AI.')">
+    <meta name="twitter:image" content="{{ asset('images/og-image.svg') }}">
+
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -12,6 +33,22 @@
         rel="stylesheet">
     @vite('resources/css/app.css')
     <link rel="stylesheet" href="{{ asset('css/notafy.css') }}">
+
+    <!-- JSON-LD Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Notafy",
+      "applicationCategory": "BusinessApplication",
+      "description": "AI-powered receipt OCR for Indonesian expense tracking",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "IDR"
+      }
+    }
+    </script>
 </head>
 
 <body>
