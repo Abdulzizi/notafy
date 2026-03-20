@@ -22,3 +22,6 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+*.Zone.Identifier
+ngrok-v3-stable-linux-amd64.tgz
+ngrok

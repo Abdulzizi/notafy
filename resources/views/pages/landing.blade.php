@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'OCR Receipt Extractor')
+@section('description', 'Extract text from any receipt instantly with AI. Free to start — no credit card required.')
 
 @section('content')
 <main style="max-width:760px;margin:0 auto;padding:6rem 1.5rem 4rem;">
