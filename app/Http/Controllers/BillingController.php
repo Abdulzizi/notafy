@@ -81,9 +81,20 @@ class BillingController extends Controller
             return response('Unauthorized', 401);
         }
 
-        \Log::info('Mayar webhook received', $request->all());
+        $event         = $request->input('event') ?? $request->input('status');
+        $transactionId = $request->input('data.id') ?? $request->input('id');
 
-        $event = $request->input('event') ?? $request->input('status');
+        \Log::info('Mayar webhook received', [
+            'event'          => $event,
+            'transaction_id' => $transactionId,
+        ]);
+
+        // Idempotency check — bail if we already processed this transaction
+        if ($transactionId && CreditTransaction::where('mayar_transaction_id', $transactionId)->exists()) {
+            \Log::info('Mayar webhook: duplicate transaction ignored', ['transaction_id' => $transactionId]);
+            return response('ok');
+        }
+
         $email = $request->input('data.customerEmail')
             ?? $request->input('data.email')
             ?? $request->input('customerEmail')
@@ -92,7 +103,7 @@ class BillingController extends Controller
         $user = $email ? User::where('email', $email)->first() : null;
 
         if (!$user) {
-            \Log::info('Mayar webhook: no user found for email', ['email' => $email]);
+            \Log::info('Mayar webhook: no user found for email');
             return response('ok');
         }
 
@@ -106,8 +117,14 @@ class BillingController extends Controller
             if ($credits > 0) {
                 $user->increment('credits', $credits);
                 $pack = $credits === 200 ? 'Starter' : 'Pro';
-                CreditTransaction::record($user->id, 'purchase', $credits, "{$pack} Pack — Mayar");
-                \Log::info("Mayar: added {$credits} credits to user {$user->id} (amount: {$amount})");
+                CreditTransaction::record(
+                    $user->id,
+                    'purchase',
+                    $credits,
+                    "{$pack} Pack — Mayar",
+                    $transactionId,
+                );
+                \Log::info("Mayar: added {$credits} credits to user {$user->id}");
             }
         }
 
