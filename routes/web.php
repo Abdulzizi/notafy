@@ -44,27 +44,11 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    Route::get('/extract', [ExtractController::class, 'index'])->name('extract.index');
-    Route::post('/extract', [ExtractController::class, 'extract'])->name('extract.submit');
-
-    Route::get('/history', [HistoryController::class, 'index'])->name('history');
-
-    Route::get('/result/{ocr}', [ResultController::class, 'show'])->name('result.show');
-    Route::delete('/result/{ocr}', [ResultController::class, 'destroy'])->name('result.destroy');
-    Route::get('/result/{ocr}/download/{format}', [ResultController::class, 'download'])
-        ->name('result.download')
-        ->where('format', 'txt|pdf');
-    Route::post('/result/{ocr}/rerun', [ResultController::class, 'rerun'])->name('result.rerun');
-
-    Route::get('/account', [AccountController::class, 'index'])->name('account');
-
-    Route::get('/credits/insufficient', fn() => view('pages.insufficient-credits'))->name('credits.insufficient');
-
     Route::get('/email/verify', fn() => view('auth.verify-email'))->name('verification.notice');
 
     Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
         $request->fulfill();
-        return redirect()->route('extract.index');
+        return redirect()->route('extract.index')->with('status', 'Email verified! Welcome to Notafy.');
     })->middleware('signed')->name('verification.verify');
 
     Route::post('/email/verification-notification', function (Request $request) {
@@ -84,6 +68,28 @@ Route::middleware('auth')->group(function () {
         Route::get('/portal',            [BillingController::class, 'portal'])->name('portal');
         Route::get('/cancel',            [BillingController::class, 'cancel'])->name('cancel');
     });
+});
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/extract', [ExtractController::class, 'index'])->name('extract.index');
+    Route::post('/extract', [ExtractController::class, 'extract'])
+        ->middleware('throttle:30,1')
+        ->name('extract.submit');
+
+    Route::get('/history', [HistoryController::class, 'index'])->name('history');
+
+    Route::get('/result/{ocr}', [ResultController::class, 'show'])->name('result.show');
+    Route::delete('/result/{ocr}', [ResultController::class, 'destroy'])->name('result.destroy');
+    Route::get('/result/{ocr}/download/{format}', [ResultController::class, 'download'])
+        ->name('result.download')
+        ->where('format', 'txt|pdf');
+    Route::post('/result/{ocr}/rerun', [ResultController::class, 'rerun'])
+        ->middleware('throttle:30,1')
+        ->name('result.rerun');
+
+    Route::get('/account', [AccountController::class, 'index'])->name('account');
+
+    Route::get('/credits/insufficient', fn() => view('pages.insufficient-credits'))->name('credits.insufficient');
 });
 
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])->name('stripe.webhook');
