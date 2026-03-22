@@ -1,5 +1,6 @@
 @extends('auth.layout')
 @section('title', 'Sign In')
+@section('description', 'Sign in to your Notafy account to extract and manage your receipts.')
 {{-- @section('panel-quote', 'Welcome back. <em>Pick up where you left off.</em>') --}}
 
 @section('panel-quote')

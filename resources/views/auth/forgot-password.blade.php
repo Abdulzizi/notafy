@@ -1,6 +1,7 @@
 @extends('auth.layout')
 
 @section('title', 'Forgot Password')
+@section('description', 'Reset your Notafy account password. Enter your email and we\'ll send you a reset link.')
 
 @section('panel-quote')
     Locked out? <em>Not for long.</em>

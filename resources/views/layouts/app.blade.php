@@ -13,14 +13,14 @@
     <meta property="og:title" content="@yield('title', 'Notafy') — Receipt OCR">
     <meta property="og:description" content="@yield('description', 'Extract receipts instantly with AI.')">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:image" content="{{ asset('images/og-image.svg') }}">
+    <meta property="og:image" content="{{ asset('images/og-image.png') }}">
     <meta property="og:site_name" content="Notafy">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="@yield('title', 'Notafy')">
     <meta name="twitter:description" content="@yield('description', 'Extract receipts instantly with AI.')">
-    <meta name="twitter:image" content="{{ asset('images/og-image.svg') }}">
+    <meta name="twitter:image" content="{{ asset('images/og-image.png') }}">
 
     <!-- Favicon -->
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -34,7 +34,19 @@
     @vite('resources/css/app.css')
     <link rel="stylesheet" href="{{ asset('css/notafy.css') }}">
 
+    <!-- Google Search Console verification (add meta tag from GSC) -->
+    {{-- <meta name="google-site-verification" content="your_gsc_verification_code"> --}}
+
+    <!-- Analytics (uncomment and replace with your GA4 measurement ID or Plausible domain) -->
+    {{--
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-XXXXXXXXXX');</script>
+    --}}
+
+    @yield('head_extra')
+
     <!-- JSON-LD Schema -->
+    @verbatim
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -49,6 +61,7 @@
       }
     }
     </script>
+    @endverbatim
 </head>
 
 <body>
