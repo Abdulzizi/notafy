@@ -54,16 +54,26 @@ class MistralOcrService
             'status'       => 'processing',
         ]);
 
-        $apiKey    = config('services.mistral.key');
-        $fullPath  = Storage::disk('local')->path($path);
-        $rawText   = $this->runMistralOcr($fullPath, $fileType);
-        $schema    = $this->extractReceiptSchema($rawText, $apiKey);
-        $columns   = $this->mapSchemaToColumns($schema);
+        try {
+            $apiKey   = config('services.mistral.key');
+            $fullPath = Storage::disk('local')->path($path);
+            $rawText  = $this->runMistralOcrWithRetry($fullPath, $fileType);
+            $schema   = $this->extractReceiptSchema($rawText, $apiKey);
+            $columns  = $this->mapSchemaToColumns($schema);
 
-        $ocr->update(array_merge([
-            'extracted_text' => $rawText,
-            'status'         => 'done',
-        ], $columns));
+            $ocr->update(array_merge([
+                'extracted_text' => $rawText,
+                'status'         => 'done',
+            ], $columns));
+        } catch (\Throwable $e) {
+            // Clean up stored file to prevent storage accumulation
+            Storage::disk('local')->delete($path);
+            if ($previewPath) {
+                Storage::disk('local')->delete($previewPath);
+            }
+            $ocr->delete();
+            throw $e;
+        }
 
         return $ocr->fresh();
     }
@@ -76,11 +86,30 @@ class MistralOcrService
     {
         $apiKey   = config('services.mistral.key');
         $fullPath = Storage::disk('local')->path($storagePath);
-        $rawText  = $this->runMistralOcr($fullPath, $fileType);
+        $rawText  = $this->runMistralOcrWithRetry($fullPath, $fileType);
         $schema   = $this->extractReceiptSchema($rawText, $apiKey);
         $columns  = $this->mapSchemaToColumns($schema);
 
         return array_merge(['extracted_text' => $rawText, 'status' => 'done'], $columns);
+    }
+
+    /**
+     * Run Mistral OCR with one retry on failure (exponential backoff).
+     */
+    private function runMistralOcrWithRetry(string $filePath, string $fileType): string
+    {
+        $lastException = null;
+        for ($attempt = 1; $attempt <= 2; $attempt++) {
+            try {
+                return $this->runMistralOcr($filePath, $fileType);
+            } catch (\RuntimeException $e) {
+                $lastException = $e;
+                if ($attempt < 2) {
+                    sleep(2 ** $attempt);
+                }
+            }
+        }
+        throw $lastException;
     }
 
     /**
