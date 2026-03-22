@@ -1,6 +1,7 @@
 @extends('auth.layout')
 
 @section('title', 'Create Account')
+@section('description', 'Create a free Notafy account and start extracting structured data from your receipts with AI.')
 
 @section('panel-quote')
     Start fresh. <em>Your account, your space.</em>
