@@ -3264,6 +3264,8 @@ input.is-invalid {
     display: flex;
     gap: 0.75rem;
     margin-top: 1.25rem;
+    padding-left: 1.75rem;
+    padding-bottom: 1.25rem;
     flex-wrap: wrap;
 }
 
