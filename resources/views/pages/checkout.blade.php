@@ -31,16 +31,16 @@
                 Pay with Card (Stripe)
             </a>
 
-            {{-- Mayar popup --}}
-            <button id="mayar-btn"
-                    class="hero-cta"
-                    style="justify-content:center;gap:0.6rem;background:var(--surface);border:1px solid var(--border);color:var(--text);cursor:pointer;">
+            {{-- Midtrans hosted checkout --}}
+            <a href="{{ route('billing.checkout.midtrans', ['pack' => $plan]) }}"
+               class="hero-cta"
+               style="justify-content:center;gap:0.6rem;background:var(--surface);border:1px solid var(--border);color:var(--text);">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
                     <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z"/>
                     <path d="M9 12l2 2 4-4"/>
                 </svg>
-                Pay with Mayar (IDR)
-            </button>
+                Pay with Midtrans (IDR)
+            </a>
 
         </div>
 
@@ -51,25 +51,4 @@
     </div>
 </div>
 
-{{-- Mayar popup script --}}
-<script src="https://app.mayar.id/payment/popup.js" defer></script>
-<script>
-    document.getElementById('mayar-btn').addEventListener('click', function () {
-        const pack = @json($plan);
-
-        fetch(`/billing/checkout/mayar-url?pack=${pack}`, {
-            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (window.MayarPopup) {
-                window.MayarPopup.open(data.url);
-            } else {
-                // Fallback: direct redirect if popup script didn't load
-                window.location.href = data.url;
-            }
-        })
-        .catch(() => alert('Could not load payment. Please try again.'));
-    });
-</script>
 @endsection

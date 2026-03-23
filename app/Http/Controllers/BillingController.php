@@ -48,84 +48,118 @@ class BillingController extends Controller
     }
 
     // ──────────────────────────────────────────
-    // Mayar (popup payment per credit pack)
+    // Midtrans Snap (hosted checkout per credit pack)
     // ──────────────────────────────────────────
 
-    /**
-     * Returns the Mayar payment URL for a given pack.
-     * Called via JS on the checkout page to get the URL before opening the popup.
-     */
-    public function mayarUrl(Request $request)
+    public function checkoutMidtrans(Request $request)
     {
-        $pack = $request->query('pack', 'pro');
-
-        $url = match ($pack) {
-            'starter' => config('services.mayar.starter_payment_url'),
-            default   => config('services.mayar.pro_payment_url'),
+        $pack   = $request->query('pack', 'pro');
+        $amount = match ($pack) {
+            'starter' => 29000,
+            default   => 99000,
         };
 
-        abort_unless($url, 500, 'Mayar payment URL not configured for this pack.');
+        $user      = $request->user();
+        $orderId   = 'INV-' . strtoupper($pack) . '-' . time();
 
-        return response()->json(['url' => $url]);
+        $payload = [
+            'transaction_details' => [
+                'order_id'     => $orderId,
+                'gross_amount' => $amount,
+            ],
+            'item_details' => [
+                [
+                    'id'       => $pack,
+                    'price'    => $amount,
+                    'quantity' => 1,
+                    'name'     => ucfirst($pack) . ' Pack',
+                ],
+            ],
+            'customer_details' => [
+                'first_name' => $user->name ?? $user->email,
+                'email'      => $user->email,
+            ],
+            'callbacks' => [
+                'finish' => route('billing.success'),
+            ],
+            'notification_url' => route('midtrans.webhook'),
+        ];
+
+        $serverKey = config('services.midtrans.server_key');
+        $baseUrl   = config('services.midtrans.env') === 'production'
+            ? 'https://app.midtrans.com/snap/v1/transactions'
+            : 'https://app.sandbox.midtrans.com/snap/v1/transactions';
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::withBasicAuth($serverKey, '')
+                ->post($baseUrl, $payload);
+        } catch (\Throwable $e) {
+            \Log::error('Midtrans checkout HTTP error', ['error' => $e->getMessage()]);
+            return redirect()->route('checkout', $pack)
+                ->with('warning', 'Payment service unavailable. Please try again later.');
+        }
+
+        $redirectUrl = $response->json('redirect_url');
+
+        if (!$redirectUrl) {
+            \Log::error('Midtrans checkout: no redirect_url returned', [
+                'status' => $response->status(),
+                'body'   => $response->body(),
+            ]);
+            return redirect()->route('checkout', $pack)
+                ->with('warning', 'Could not create Midtrans payment. Please try again later.');
+        }
+
+        return redirect($redirectUrl);
     }
 
-    public function webhookMayar(Request $request)
+    public function webhookMidtrans(Request $request)
     {
-        // Verify HMAC signature
-        $secret    = config('services.mayar.webhook_secret');
-        $signature = $request->header('X-Mayar-Signature') ?? '';
-        $expected  = hash_hmac('sha256', $request->getContent(), $secret);
+        $orderId           = $request->input('order_id') ?? '';
+        $statusCode        = $request->input('status_code') ?? '';
+        $grossAmount       = $request->input('gross_amount') ?? '';
+        $incomingSignature = $request->input('signature_key') ?? '';
+        $transactionStatus = $request->input('transaction_status') ?? '';
 
-        if ($secret && !hash_equals($expected, $signature)) {
-            \Log::warning('Mayar webhook signature mismatch');
+        $serverKey        = config('services.midtrans.server_key');
+        $expectedSignature = hash('sha512', $orderId . $statusCode . $grossAmount . $serverKey);
+
+        if ($serverKey && !hash_equals($expectedSignature, $incomingSignature)) {
+            \Log::warning('Midtrans webhook signature mismatch');
             return response('Unauthorized', 401);
         }
 
-        $event         = $request->input('event') ?? $request->input('status');
-        $transactionId = $request->input('data.id') ?? $request->input('id');
-
-        \Log::info('Mayar webhook received', [
-            'event'          => $event,
-            'transaction_id' => $transactionId,
-        ]);
-
-        // Idempotency check — bail if we already processed this transaction
-        if ($transactionId && CreditTransaction::where('mayar_transaction_id', $transactionId)->exists()) {
-            \Log::info('Mayar webhook: duplicate transaction ignored', ['transaction_id' => $transactionId]);
+        if (!in_array($transactionStatus, ['settlement', 'capture'])) {
             return response('ok');
         }
 
-        $email = $request->input('data.customerEmail')
-            ?? $request->input('data.email')
-            ?? $request->input('customerEmail')
-            ?? $request->input('email');
+        if ($orderId && CreditTransaction::where('midtrans_transaction_id', $orderId)->exists()) {
+            \Log::info('Midtrans webhook: duplicate transaction ignored', ['order_id' => $orderId]);
+            return response('ok');
+        }
 
-        $user = $email ? User::where('email', $email)->first() : null;
+        $email = $request->input('customer_details.email');
+        $user  = $email ? User::where('email', $email)->first() : null;
 
         if (!$user) {
-            \Log::info('Mayar webhook: no user found for email');
+            \Log::info('Midtrans webhook: no user found for email');
             return response('ok');
         }
 
-        $paidEvents = ['payment.success', 'paid', 'payment_link.paid'];
+        $amount  = (int) round((float) $grossAmount);
+        $credits = $this->creditsFromAmount($amount);
 
-        if (in_array($event, $paidEvents)) {
-            // Identify which pack by amount (Rp 29.000 = starter, Rp 99.000 = pro)
-            $amount  = (int) ($request->input('data.amount') ?? $request->input('amount') ?? 0);
-            $credits = $this->creditsFromAmount($amount);
-
-            if ($credits > 0) {
-                $user->increment('credits', $credits);
-                $pack = $credits === 200 ? 'Starter' : 'Pro';
-                CreditTransaction::record(
-                    $user->id,
-                    'purchase',
-                    $credits,
-                    "{$pack} Pack — Mayar",
-                    $transactionId,
-                );
-                \Log::info("Mayar: added {$credits} credits to user {$user->id}");
-            }
+        if ($credits > 0) {
+            $user->increment('credits', $credits);
+            $pack = $credits === 200 ? 'Starter' : 'Pro';
+            CreditTransaction::record(
+                $user->id,
+                'purchase',
+                $credits,
+                "{$pack} Pack — Midtrans",
+                $orderId,
+            );
+            \Log::info("Midtrans: added {$credits} credits to user {$user->id}");
         }
 
         return response('ok');

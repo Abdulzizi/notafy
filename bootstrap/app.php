@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->validateCsrfTokens(except: [
             'stripe/webhook',
-            'mayar/webhook',
+            'midtrans/webhook',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
