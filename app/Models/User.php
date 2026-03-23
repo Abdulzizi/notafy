@@ -66,12 +66,12 @@ class User extends Authenticatable implements MustVerifyEmail
     public function refillCreditsIfDue(): void
     {
         if ($this->plan === 'free') {
-            $startOfWeek = now()->startOfWeek();
-            if ($this->credits_last_refilled_at && $this->credits_last_refilled_at->gte($startOfWeek)) {
+            $startOfMonth = now()->startOfMonth();
+            if ($this->credits_last_refilled_at && $this->credits_last_refilled_at->gte($startOfMonth)) {
                 return;
             }
             $this->update(['credits' => 10, 'credits_last_refilled_at' => now()]);
-            CreditTransaction::record($this->id, 'refill', 10, 'Weekly credit reset');
+            CreditTransaction::record($this->id, 'refill', 10, 'Monthly credit reset');
             return;
         }
 

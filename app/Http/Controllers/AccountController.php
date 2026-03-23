@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\CreditTransaction;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AccountController extends Controller
 {
@@ -21,5 +23,30 @@ class AccountController extends Controller
             'credits'      => $user->credits ?? 0,
             'transactions' => $transactions,
         ]);
+    }
+
+    public function destroy(Request $request)
+    {
+        $user = $request->user();
+
+        foreach ($user->ocrResults as $ocr) {
+            $ocr->deleteFiles();
+        }
+
+        $user->ocrResults()->delete();
+        CreditTransaction::where('user_id', $user->id)->delete();
+        $user->identities()->delete();
+
+        if ($user->stripe_id && $user->subscribed()) {
+            $user->subscription()->cancelNow();
+        }
+
+        $user->delete();
+
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('home')->with('status', 'Your account has been permanently deleted.');
     }
 }

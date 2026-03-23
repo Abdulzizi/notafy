@@ -54,7 +54,7 @@
         <div style="display:grid;gap:0.75rem;">
             <div style="display:flex;justify-content:space-between;">
                 <span style="color:var(--muted);">Gateway</span>
-                <span style="color:var(--text);font-weight:500;text-transform:capitalize;">{{ $user->billing_gateway ?? '—' }}</span>
+                <span style="color:var(--text);font-weight:500;text-transform:capitalize;">{{ $user->billing_gateway ?? 'n/a' }}</span>
             </div>
             @if($user->billing_gateway === 'mayar' && $user->pro_until)
             <div style="display:flex;justify-content:space-between;">
@@ -121,9 +121,71 @@
     </p>
     @else
     <p style="font-size:0.8rem;color:var(--muted);text-align:center;">
-        Free plan resets to 10 credits every Monday. <a href="{{ route('pricing') }}" style="color:var(--accent);">Upgrade</a> for more.
+        Free plan resets to 10 credits on the 1st of each month. <a href="{{ route('pricing') }}" style="color:var(--accent);">Upgrade</a> for more.
     </p>
     @endif
 
+
+    {{-- Danger Zone --}}
+    <div class="account-card" style="background:var(--surface);border:1px solid rgba(220,50,50,0.4);border-radius:12px;padding:1.5rem;margin-top:2rem;">
+        <div style="font-size:0.75rem;color:#e05050;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:1rem;">Danger Zone</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+            <div>
+                <div style="font-weight:600;color:var(--text);margin-bottom:0.25rem;font-size:0.9rem;">Delete Account</div>
+                <div style="font-size:0.85rem;color:var(--muted);">Permanently delete your account, all results, and uploaded files.</div>
+            </div>
+            <button id="delete-account-btn" style="flex-shrink:0;padding:0.5rem 1.1rem;background:transparent;border:1px solid rgba(220,50,50,0.5);border-radius:8px;color:#e05050;font-size:0.85rem;font-weight:600;cursor:pointer;">Delete my account</button>
+        </div>
+    </div>
+
 </div>
+
+<div class="modal-overlay" id="delete-account-modal">
+    <div class="modal-card">
+        <h3 style="margin:0 0 0.75rem;color:var(--text);">Delete your account?</h3>
+        <p style="color:var(--muted);font-size:0.9rem;line-height:1.6;margin:0 0 1.25rem;">This will permanently delete all your results, uploaded files, and account data. <strong style="color:var(--text);">It cannot be undone.</strong></p>
+        <div style="margin-bottom:1.5rem;">
+            <label for="delete-confirm-input" style="display:block;font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem;">Type <strong style="color:var(--text);">delete this account</strong> to confirm</label>
+            <input id="delete-confirm-input" type="text" autocomplete="off" placeholder="delete this account" style="width:100%;box-sizing:border-box;padding:0.55rem 0.75rem;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:0.9rem;">
+        </div>
+        <div class="modal-actions">
+            <button class="modal-btn modal-btn--cancel" id="delete-cancel-btn">Cancel</button>
+            <form method="POST" action="{{ route('account.destroy') }}" style="display:inline;">
+                @csrf
+                @method('DELETE')
+                <button id="delete-confirm-btn" type="submit" class="modal-btn modal-btn--confirm" disabled style="opacity:0.4;cursor:not-allowed;">Delete everything</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const overlay      = document.getElementById('delete-account-modal');
+    const openBtn      = document.getElementById('delete-account-btn');
+    const cancelBtn    = document.getElementById('delete-cancel-btn');
+    const confirmInput = document.getElementById('delete-confirm-input');
+    const confirmBtn   = document.getElementById('delete-confirm-btn');
+
+    openBtn.addEventListener('click', () => {
+        overlay.classList.add('modal-overlay--visible');
+        confirmInput.focus();
+    });
+
+    cancelBtn.addEventListener('click', () => {
+        overlay.classList.remove('modal-overlay--visible');
+        confirmInput.value = '';
+        confirmBtn.disabled = true;
+        confirmBtn.style.opacity = '0.4';
+        confirmBtn.style.cursor = 'not-allowed';
+    });
+
+    confirmInput.addEventListener('input', () => {
+        const match = confirmInput.value === 'delete this account';
+        confirmBtn.disabled = !match;
+        confirmBtn.style.opacity = match ? '1' : '0.4';
+        confirmBtn.style.cursor = match ? 'pointer' : 'not-allowed';
+    });
+})();
+</script>
 @endsection

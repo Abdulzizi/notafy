@@ -121,7 +121,7 @@ class BillingTest extends TestCase
         $this->assertNotNull($user->fresh()->credits_last_refilled_at);
     }
 
-    public function test_purchased_credits_not_reset_by_weekly_refill(): void
+    public function test_purchased_credits_not_reset_by_monthly_refill(): void
     {
         $user = User::factory()->create([
             'email'   => 'buyer@example.com',

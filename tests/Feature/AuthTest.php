@@ -94,7 +94,7 @@ class AuthTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_new_user_gets_only_welcome_bonus_not_weekly_refill(): void
+    public function test_new_user_gets_only_welcome_bonus_not_monthly_refill(): void
     {
         $this->post('/register', [
             'name'                  => 'New User',
