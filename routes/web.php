@@ -92,6 +92,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('result.rerun');
 
     Route::get('/account', [AccountController::class, 'index'])->name('account');
+    Route::delete('/account', [AccountController::class, 'destroy'])->name('account.destroy');
 
     Route::get('/credits/insufficient', fn() => view('pages.insufficient-credits'))->name('credits.insufficient');
 });
