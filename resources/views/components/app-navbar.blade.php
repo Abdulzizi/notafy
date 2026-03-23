@@ -14,15 +14,15 @@
         <div class="app-navbar-right">
             @auth
                 <span class="credits-badge">{{ auth()->user()->credits ?? 0 }} credits</span>
+                <a href="{{ route('account') }}" class="app-user" style="text-decoration:none;">
+                    <div class="app-user-avatar">{{ strtoupper(substr(auth()->user()->name ?? auth()->user()->email, 0, 1)) }}</div>
+                    <span class="app-user-name">{{ auth()->user()->email }}</span>
+                </a>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="app-logout">Sign out</button>
+                </form>
             @endauth
-            <a href="{{ route('account') }}" class="app-user" style="text-decoration:none;">
-                <div class="app-user-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
-                <span class="app-user-name">{{ auth()->user()->email }}</span>
-            </a>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="app-logout">Sign out</button>
-            </form>
         </div>
     </nav>
 
@@ -48,13 +48,14 @@
             <a href="{{ route('account') }}"
                 class="overlay-link {{ request()->routeIs('account') ? 'active' : '' }}">Account</a>
         </nav>
+        @auth
         <div class="overlay-actions">
             <div class="overlay-user">
                 <div class="app-user-avatar" style="width:40px;height:40px;font-size:0.9rem;">
-                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                    {{ strtoupper(substr(auth()->user()->name ?? auth()->user()->email, 0, 1)) }}
                 </div>
                 <div>
-                    <div style="font-size:0.9rem;color:var(--text);font-weight:500;">{{ auth()->user()->name }}</div>
+                    <div style="font-size:0.9rem;color:var(--text);font-weight:500;">{{ auth()->user()->name ?? auth()->user()->email }}</div>
                     <div style="font-size:0.78rem;color:var(--muted);">{{ auth()->user()->email }}</div>
                 </div>
             </div>
@@ -63,6 +64,7 @@
                 <button type="submit" class="overlay-signout">Sign out</button>
             </form>
         </div>
+        @endauth
     </div>
 </div>
 
