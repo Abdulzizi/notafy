@@ -94,6 +94,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/account', [AccountController::class, 'index'])->name('account');
     Route::delete('/account', [AccountController::class, 'destroy'])->name('account.destroy');
 
+    Route::post('/onboarding/dismiss', function () {
+        auth()->user()->update(['onboarding_dismissed_at' => now()]);
+        return response()->noContent();
+    })->name('onboarding.dismiss');
+
     Route::get('/credits/insufficient', fn() => view('pages.insufficient-credits'))->name('credits.insufficient');
 });
 

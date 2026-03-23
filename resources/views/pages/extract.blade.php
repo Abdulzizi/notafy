@@ -6,6 +6,72 @@
 @section('content')
 <div class="extract-page">
 
+    @if ($showOnboarding ?? false)
+    <div id="onboarding-banner" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.5rem 1.75rem;margin-bottom:1.75rem;position:relative;">
+        <button id="onboarding-dismiss" aria-label="Dismiss" style="position:absolute;top:1rem;right:1rem;background:none;border:none;cursor:pointer;color:var(--muted);line-height:1;padding:0.25rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin-bottom:0.6rem;">Welcome to Notafy</div>
+        <p style="font-size:0.95rem;font-weight:500;color:var(--text);margin:0 0 1.25rem;">Here is how it works. Three steps, that is it.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:1.25rem;">
+            <div style="display:flex;gap:0.75rem;align-items:flex-start;">
+                <div style="width:32px;height:32px;border-radius:8px;background:rgba(200,184,154,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                </div>
+                <div>
+                    <div style="font-size:0.82rem;font-weight:600;color:var(--text);margin-bottom:0.2rem;">Upload</div>
+                    <div style="font-size:0.78rem;color:var(--muted);line-height:1.5;">Drop any receipt photo or PDF. Up to 10MB.</div>
+                </div>
+            </div>
+            <div style="display:flex;gap:0.75rem;align-items:flex-start;">
+                <div style="width:32px;height:32px;border-radius:8px;background:rgba(200,184,154,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </div>
+                <div>
+                    <div style="font-size:0.82rem;font-weight:600;color:var(--text);margin-bottom:0.2rem;">Extract</div>
+                    <div style="font-size:0.78rem;color:var(--muted);line-height:1.5;">AI reads it and returns structured text in seconds.</div>
+                </div>
+            </div>
+            <div style="display:flex;gap:0.75rem;align-items:flex-start;">
+                <div style="width:32px;height:32px;border-radius:8px;background:rgba(200,184,154,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                </div>
+                <div>
+                    <div style="font-size:0.82rem;font-weight:600;color:var(--text);margin-bottom:0.2rem;">Save and copy</div>
+                    <div style="font-size:0.78rem;color:var(--muted);line-height:1.5;">Every result is saved to History. Copy the JSON or download it.</div>
+                </div>
+            </div>
+            <div style="display:flex;gap:0.75rem;align-items:flex-start;">
+                <div style="width:32px;height:32px;border-radius:8px;background:rgba(200,184,154,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <div>
+                    <div style="font-size:0.82rem;font-weight:600;color:var(--text);margin-bottom:0.2rem;">Credits</div>
+                    <div style="font-size:0.78rem;color:var(--muted);line-height:1.5;">You have 10 free credits this month. Each extraction uses 1.</div>
+                </div>
+            </div>
+        </div>
+        <button id="onboarding-got-it" style="padding:0.5rem 1.25rem;background:var(--accent);color:#0c0c0e;border:none;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;">Got it, let's start</button>
+    </div>
+    <script>
+    (function () {
+        function dismissOnboarding() {
+            const banner = document.getElementById('onboarding-banner');
+            if (banner) banner.style.display = 'none';
+            fetch('{{ route('onboarding.dismiss') }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                },
+            });
+        }
+        document.getElementById('onboarding-got-it').addEventListener('click', dismissOnboarding);
+        document.getElementById('onboarding-dismiss').addEventListener('click', dismissOnboarding);
+    })();
+    </script>
+    @endif
+
     @if ($errors->has('extract'))
         <div class="alert alert-error">{{ $errors->first('extract') }}</div>
     @endif

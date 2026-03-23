@@ -13,8 +13,11 @@ class ExtractController extends Controller
         $user = auth()->user();
         $user->refillCreditsIfDue();
 
+        $fresh = $user->fresh();
+
         return view('pages.extract', [
-            'credits' => $user->fresh()->credits ?? 0,
+            'credits'         => $fresh->credits ?? 0,
+            'showOnboarding'  => $fresh->onboarding_dismissed_at === null,
         ]);
     }
 
@@ -38,9 +41,11 @@ class ExtractController extends Controller
                 $request->file('receipt'),
                 $user->id
             );
+            $fresh = $user->fresh();
             return view('pages.extract', [
-                'result'  => $result,
-                'credits' => $user->fresh()->credits,
+                'result'         => $result,
+                'credits'        => $fresh->credits,
+                'showOnboarding' => false,
             ]);
         } catch (\Exception $e) {
             $user->increment('credits');
