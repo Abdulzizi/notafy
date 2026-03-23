@@ -55,10 +55,11 @@ class AuthController extends Controller
         ]);
 
         $user = User::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
-            'password' => Hash::make($data['password']),
-            'credits'  => 10,
+            'name'                    => $data['name'],
+            'email'                   => $data['email'],
+            'password'                => Hash::make($data['password']),
+            'credits'                 => 10,
+            'credits_last_refilled_at' => now(),
         ]);
 
         event(new Registered($user));

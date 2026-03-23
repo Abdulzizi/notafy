@@ -150,8 +150,11 @@ class BillingController extends Controller
         $credits = $this->creditsFromAmount($amount);
 
         if ($credits > 0) {
-            $user->increment('credits', $credits);
             $pack = $credits === 200 ? 'Starter' : 'Pro';
+            $user->increment('credits', $credits, [
+                'plan'                    => strtolower($pack),
+                'credits_last_refilled_at' => now(),
+            ]);
             CreditTransaction::record(
                 $user->id,
                 'purchase',

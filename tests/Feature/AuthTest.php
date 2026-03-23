@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\CreditTransaction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
@@ -91,5 +92,22 @@ class AuthTest extends TestCase
         $this->actingAs($user)->post('/logout');
 
         $this->assertGuest();
+    }
+
+    public function test_new_user_gets_only_welcome_bonus_not_weekly_refill(): void
+    {
+        $this->post('/register', [
+            'name'                  => 'New User',
+            'email'                 => 'newuser@example.com',
+            'password'              => 'password123',
+            'password_confirmation' => 'password123',
+        ]);
+
+        $user = User::where('email', 'newuser@example.com')->first();
+        $user->refillCreditsIfDue();
+
+        $this->assertEquals(10, $user->fresh()->credits);
+        $this->assertDatabaseCount('credit_transactions', 1);
+        $this->assertDatabaseHas('credit_transactions', ['type' => 'bonus', 'credits' => 10]);
     }
 }
