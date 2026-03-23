@@ -9,14 +9,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('credit_transactions', function (Blueprint $table) {
-            $table->renameColumn('mayar_transaction_id', 'midtrans_transaction_id');
+            $table->renameColumn('mayar_transaction_id', 'doku_transaction_id');
         });
     }
 
     public function down(): void
     {
         Schema::table('credit_transactions', function (Blueprint $table) {
-            $table->renameColumn('midtrans_transaction_id', 'mayar_transaction_id');
+            $table->renameColumn('doku_transaction_id', 'mayar_transaction_id');
         });
     }
 };

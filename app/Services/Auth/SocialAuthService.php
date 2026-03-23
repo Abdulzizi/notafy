@@ -43,10 +43,11 @@ class SocialAuthService
             }
 
             $user = User::create([
-                'name'     => $name,
-                'email'    => $email,
-                'password' => Str::random(32),
-                'credits'  => 10,
+                'name'                    => $name,
+                'email'                   => $email,
+                'password'                => Str::random(32),
+                'credits'                 => 10,
+                'credits_last_refilled_at' => now(),
             ]);
             CreditTransaction::record($user->id, 'bonus', 10, 'Welcome bonus');
         }

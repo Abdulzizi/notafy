@@ -36,7 +36,10 @@ class StripeWebhookController extends WebhookController
         };
 
         if ($credits > 0) {
-            $user->increment('credits', $credits);
+            $user->increment('credits', $credits, [
+                'plan'                    => $pack,
+                'credits_last_refilled_at' => now(),
+            ]);
             CreditTransaction::record($userId, 'purchase', $credits, ucfirst($pack) . ' Pack — Stripe');
             \Log::info("Stripe: added {$credits} credits to user {$userId} ({$pack} pack)");
         }

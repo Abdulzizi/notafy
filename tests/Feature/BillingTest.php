@@ -106,4 +106,33 @@ class BillingTest extends TestCase
 
         $this->assertEquals(0, $user->fresh()->credits);
     }
+
+    public function test_purchasing_starter_upgrades_plan_to_starter(): void
+    {
+        $user = User::factory()->create([
+            'email'   => 'buyer@example.com',
+            'credits' => 0,
+            'plan'    => 'free',
+        ]);
+
+        $this->postJson('/midtrans/webhook', $this->midtransPayload('INV-STARTER-UP', 29000));
+
+        $this->assertEquals('starter', $user->fresh()->plan);
+        $this->assertNotNull($user->fresh()->credits_last_refilled_at);
+    }
+
+    public function test_purchased_credits_not_reset_by_weekly_refill(): void
+    {
+        $user = User::factory()->create([
+            'email'   => 'buyer@example.com',
+            'credits' => 0,
+            'plan'    => 'free',
+        ]);
+
+        $this->postJson('/midtrans/webhook', $this->midtransPayload('INV-NORESET-001', 29000));
+
+        $user->refresh()->refillCreditsIfDue();
+
+        $this->assertEquals(200, $user->fresh()->credits);
+    }
 }
