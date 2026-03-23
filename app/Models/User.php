@@ -23,6 +23,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'credits_last_refilled_at',
         'billing_gateway',
         'pro_until',
+        'onboarding_dismissed_at',
     ];
 
     protected $hidden = [
@@ -36,7 +37,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at'       => 'datetime',
             'password'                => 'hashed',
             'pro_until'               => 'datetime',
-            'credits_last_refilled_at' => 'datetime',
+            'credits_last_refilled_at'   => 'datetime',
+            'onboarding_dismissed_at'    => 'datetime',
         ];
     }
 
