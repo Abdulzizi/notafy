@@ -52,7 +52,6 @@ class SocialAuthService
             CreditTransaction::record($user->id, 'bonus', 10, 'Welcome bonus');
         }
 
-        // link identity
         UserIdentity::create([
             'user_id' => $user->id,
             'provider' => $provider,

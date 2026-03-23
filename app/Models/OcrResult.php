@@ -3,41 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class OcrResult extends Model
 {
     protected $fillable = [
-        // ── Core upload fields ────────────────────────────────────────────────
-        'user_id',
-        'filename',
-        'file_path',
-        'preview_path',
-        'file_type',
-        'language',
-        'extracted_text',   // raw OCR output — maps to schema's raw_text
-        'confidence',       // Tesseract word-level confidence, 0–100 scale
-        'status',
-        'ocr_engine',
-        'custom_prompt',
-
-        // ── Notafy expense receipt schema ─────────────────────────────────────
-        'platform',         // shopee|tokopedia|gofood|gocar|goride|grabfood|grabbike|grabcar|indomaret|nota_warung|unknown
-        'category',         // transport|food|belanja|other
-        'transaction_id',   // No. Pesanan / Order ID / Booking Code
-        'transaction_date', // YYYY-MM-DD
-        'transaction_time', // HH:mm (nullable)
-        'vendor_name',      // nama toko / resto / seller
-        'employee_name',    // nama karyawan, from transport receipts (nullable)
-        'subtotal',         // IDR, no decimals (nullable)
-        'discount',         // IDR (nullable)
-        'delivery_fee',     // IDR (nullable)
-        'service_fee',      // IDR (nullable)
-        'tax',              // PPN, IDR (nullable)
-        'total_amount',     // IDR — always required
-        'payment_method',   // GoPay|LinkAja|Bank BRI|COD|etc
-        'source_type',      // digital_pdf|digital_jpg|thermal_scan|photo_hardcopy
-        'confidence_score', // 0.0–1.0, Notafy's own quality assessment
-        'needs_review',     // true if confidence_score < 0.75
+        'user_id', 'filename', 'file_path', 'preview_path', 'file_type',
+        'language', 'extracted_text', 'confidence', 'status', 'ocr_engine',
+        'custom_prompt', 'platform', 'category', 'transaction_id',
+        'transaction_date', 'transaction_time', 'vendor_name', 'employee_name',
+        'subtotal', 'discount', 'delivery_fee', 'service_fee', 'tax',
+        'total_amount', 'payment_method', 'source_type', 'confidence_score',
+        'needs_review',
     ];
 
     protected $casts = [
@@ -55,5 +32,18 @@ class OcrResult extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function authorizeOwner(): void
+    {
+        abort_if($this->user_id !== auth()->id(), 403);
+    }
+
+    public function deleteFiles(): void
+    {
+        Storage::disk('local')->delete($this->file_path);
+        if ($this->preview_path) {
+            Storage::disk('local')->delete($this->preview_path);
+        }
     }
 }

@@ -5,30 +5,26 @@ namespace App\Http\Controllers;
 use App\Models\CreditTransaction;
 use App\Models\OcrResult;
 use App\Services\MistralOcrService;
-use Illuminate\Support\Facades\Storage;
 
 class ResultController extends Controller
 {
     public function show(OcrResult $ocr)
     {
-        abort_if($ocr->user_id !== auth()->id(), 403);
+        $ocr->authorizeOwner();
         return view('pages.result', compact('ocr'));
     }
 
     public function destroy(OcrResult $ocr)
     {
-        abort_if($ocr->user_id !== auth()->id(), 403);
-        Storage::disk('local')->delete($ocr->file_path);
-        if ($ocr->preview_path) {
-            Storage::disk('local')->delete($ocr->preview_path);
-        }
+        $ocr->authorizeOwner();
+        $ocr->deleteFiles();
         $ocr->delete();
         return redirect()->route('history')->with('status', 'Nota dihapus.');
     }
 
     public function download(OcrResult $ocr, string $format)
     {
-        abort_if($ocr->user_id !== auth()->id(), 403);
+        $ocr->authorizeOwner();
         abort_unless(auth()->user()->isPro(), 403);
         abort_unless(in_array($format, ['txt', 'pdf']), 404);
 
@@ -46,7 +42,7 @@ class ResultController extends Controller
 
     public function rerun(OcrResult $ocr)
     {
-        abort_if($ocr->user_id !== auth()->id(), 403);
+        $ocr->authorizeOwner();
         abort_if($ocr->status !== 'done', 422);
 
         $user = auth()->user();

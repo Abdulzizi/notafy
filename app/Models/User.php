@@ -56,23 +56,13 @@ class User extends Authenticatable implements MustVerifyEmail
             return false;
         }
 
-        // Mayar: check expiry date
         if ($this->billing_gateway === 'mayar') {
             return $this->pro_until && $this->pro_until->isFuture();
         }
 
-        // Stripe: Cashier manages the subscription
         return true;
     }
 
-    /**
-     * Refill or reset credits based on the user's plan and refill period.
-     * Safe to call on every page load — only acts once per period.
-     *
-     * Free:    reset to 10 credits weekly
-     * Starter: reset to 200 credits monthly
-     * Pro:     add 100 credits monthly
-     */
     public function refillCreditsIfDue(): void
     {
         if ($this->plan === 'free') {

@@ -8,10 +8,6 @@ use Illuminate\Http\Request;
 
 class BillingController extends Controller
 {
-    // ──────────────────────────────────────────
-    // Stripe (one-time payment per credit pack)
-    // ──────────────────────────────────────────
-
     public function checkoutStripe(Request $request)
     {
         $pack = $request->query('pack', 'pro');
@@ -46,10 +42,6 @@ class BillingController extends Controller
     {
         return $request->user()->redirectToBillingPortal(route('extract.index'));
     }
-
-    // ──────────────────────────────────────────
-    // Midtrans Snap (hosted checkout per credit pack)
-    // ──────────────────────────────────────────
 
     public function checkoutMidtrans(Request $request)
     {
@@ -176,10 +168,6 @@ class BillingController extends Controller
         if ($amount >= 89100 && $amount <= 108900) return 1000;
         return 0;
     }
-
-    // ──────────────────────────────────────────
-    // Shared
-    // ──────────────────────────────────────────
 
     public function success(Request $request)
     {

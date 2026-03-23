@@ -14,7 +14,6 @@ use Illuminate\Auth\Events\Registered;
 
 class AuthController extends Controller
 {
-    //! VIEWS
     public function showLogin()
     {
         return view('auth.login');
@@ -25,7 +24,6 @@ class AuthController extends Controller
         return view('auth.register');
     }
 
-    //! MANUAL AUTH
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -81,7 +79,6 @@ class AuthController extends Controller
         return redirect()->route('login');
     }
 
-    //! GOOGLE SSO
     public function googleRedirect()
     {
         return Socialite::driver('google')

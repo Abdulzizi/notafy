@@ -8,10 +8,6 @@ use Laravel\Cashier\Http\Controllers\WebhookController;
 
 class StripeWebhookController extends WebhookController
 {
-    /**
-     * Handle checkout.session.completed — fires after a one-time payment succeeds.
-     * Metadata on the session carries user_id and pack (starter|pro).
-     */
     public function handleCheckoutSessionCompleted(array $payload): \Symfony\Component\HttpFoundation\Response
     {
         $session  = $payload['data']['object'];
