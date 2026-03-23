@@ -9,7 +9,7 @@
     <div style="margin-bottom:3rem;text-align:center;">
         <div style="font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.75rem;">Support</div>
         <h1 style="font-size:2rem;font-weight:700;color:var(--text);margin-bottom:0.75rem;">Contact Us</h1>
-        <p style="color:var(--muted);max-width:480px;margin:0 auto;">We're a small team and we read every message. Expect a reply within 1–2 business days.</p>
+        <p style="color:var(--muted);max-width:480px;margin:0 auto;">We read every message. You will hear back within one to two business days.</p>
     </div>
 
     <div style="display:grid;gap:1rem;max-width:480px;margin:0 auto;">

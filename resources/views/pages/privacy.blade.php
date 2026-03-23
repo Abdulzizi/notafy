@@ -18,11 +18,11 @@
 
         <h2 style="font-size:1.1rem;font-weight:600;color:var(--text);margin:2.5rem 0 0.75rem;">1. Data We Collect</h2>
         <ul style="margin:0.75rem 0 0.75rem 1.5rem;display:flex;flex-direction:column;gap:0.5rem;">
-            <li><strong style="color:var(--text);">Account info</strong> — name and email address when you register</li>
-            <li><strong style="color:var(--text);">Uploaded files</strong> — receipt images and PDFs you submit for extraction</li>
-            <li><strong style="color:var(--text);">Extracted text</strong> — the OCR output stored in your history</li>
-            <li><strong style="color:var(--text);">Usage data</strong> — credit balance, transaction history, and extraction timestamps</li>
-            <li><strong style="color:var(--text);">Payment data</strong> — handled entirely by Stripe or Midtrans; we never see your card number or bank details</li>
+            <li><strong style="color:var(--text);">Account info:</strong> name and email address when you register</li>
+            <li><strong style="color:var(--text);">Uploaded files:</strong> receipt images and PDFs you submit for extraction</li>
+            <li><strong style="color:var(--text);">Extracted text:</strong> the OCR output stored in your history</li>
+            <li><strong style="color:var(--text);">Usage data:</strong> credit balance, transaction history, and extraction timestamps</li>
+            <li><strong style="color:var(--text);">Payment data:</strong> handled entirely by Stripe or Midtrans. We never see your card number or bank details</li>
         </ul>
 
         <h2 style="font-size:1.1rem;font-weight:600;color:var(--text);margin:2.5rem 0 0.75rem;">2. How We Use It</h2>
@@ -37,10 +37,10 @@
         <h2 style="font-size:1.1rem;font-weight:600;color:var(--text);margin:2.5rem 0 0.75rem;">3. Third-Party Services</h2>
         <p>We use the following processors to deliver the service:</p>
         <ul style="margin:0.75rem 0 0.75rem 1.5rem;display:flex;flex-direction:column;gap:0.5rem;">
-            <li><strong style="color:var(--text);">Mistral AI</strong> — receives your uploaded files for OCR processing</li>
-            <li><strong style="color:var(--text);">Stripe</strong> — handles card payments; subject to <a href="https://stripe.com/privacy" target="_blank" rel="noopener" style="color:var(--accent);">Stripe's Privacy Policy</a></li>
-            <li><strong style="color:var(--text);">Midtrans</strong> — handles IDR payments (QRIS, bank transfer)</li>
-            <li><strong style="color:var(--text);">Google</strong> — optional OAuth sign-in; subject to <a href="https://policies.google.com/privacy" target="_blank" rel="noopener" style="color:var(--accent);">Google's Privacy Policy</a></li>
+            <li><strong style="color:var(--text);">Mistral AI:</strong> receives your uploaded files for OCR processing</li>
+            <li><strong style="color:var(--text);">Stripe:</strong> handles card payments, subject to <a href="https://stripe.com/privacy" target="_blank" rel="noopener" style="color:var(--accent);">Stripe's Privacy Policy</a></li>
+            <li><strong style="color:var(--text);">Midtrans:</strong> handles IDR payments (QRIS, bank transfer)</li>
+            <li><strong style="color:var(--text);">Google:</strong> optional OAuth sign-in, subject to <a href="https://policies.google.com/privacy" target="_blank" rel="noopener" style="color:var(--accent);">Google's Privacy Policy</a></li>
         </ul>
 
         <h2 style="font-size:1.1rem;font-weight:600;color:var(--text);margin:2.5rem 0 0.75rem;">4. Data Storage & Retention</h2>
@@ -55,7 +55,7 @@
         </ul>
 
         <h2 style="font-size:1.1rem;font-weight:600;color:var(--text);margin:2.5rem 0 0.75rem;">6. Cookies</h2>
-        <p>We use a session cookie to keep you logged in. No third-party tracking cookies are set. Google Analytics may be enabled in the future — this policy will be updated if so.</p>
+        <p>We use a session cookie to keep you logged in. No third-party tracking cookies are set. If Google Analytics is enabled in the future, this policy will be updated to reflect that.</p>
 
         <h2 style="font-size:1.1rem;font-weight:600;color:var(--text);margin:2.5rem 0 0.75rem;">7. Changes</h2>
         <p>We may update this policy. We will notify you by email for material changes. Continued use of the service constitutes acceptance.</p>
