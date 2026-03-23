@@ -45,10 +45,11 @@ return [
         'key' => env('MISTRAL_API_KEY'),
     ],
 
-    'mayar' => [
-        'webhook_secret'      => env('MAYAR_WEBHOOK_SECRET'),
-        'starter_payment_url' => env('MAYAR_STARTER_PAYMENT_URL'),
-        'pro_payment_url'     => env('MAYAR_PRO_PAYMENT_URL'),
+    'midtrans' => [
+        'env'         => env('MIDTRANS_ENV', 'sandbox'),
+        'merchant_id' => env('MIDTRANS_MERCHANT_ID'),
+        'client_key'  => env('MIDTRANS_CLIENT_KEY'),
+        'server_key'  => env('MIDTRANS_SERVER_KEY'),
     ],
 
     'adsense' => [

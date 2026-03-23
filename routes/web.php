@@ -25,7 +25,7 @@ Route::get('/', function () {
 
 Route::get('/about', fn() => view('about'))->name('about');
 Route::get('/pricing', [PricingController::class, 'index'])->name('pricing');
-Route::get('/checkout/{plan}', [CheckoutController::class, 'show'])->name('checkout');
+Route::get('/checkout/{plan}', [CheckoutController::class, 'show'])->name('checkout')->middleware('auth');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -62,8 +62,8 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('billing')->name('billing.')->group(function () {
-        Route::get('/checkout/stripe',   [BillingController::class, 'checkoutStripe'])->name('checkout.stripe');
-        Route::get('/checkout/mayar-url',[BillingController::class, 'mayarUrl'])->name('checkout.mayar-url');
+        Route::get('/checkout/stripe',    [BillingController::class, 'checkoutStripe'])->name('checkout.stripe');
+        Route::get('/checkout/midtrans',  [BillingController::class, 'checkoutMidtrans'])->name('checkout.midtrans');
         Route::get('/success',           [BillingController::class, 'success'])->name('success');
         Route::get('/portal',            [BillingController::class, 'portal'])->name('portal');
         Route::get('/cancel',            [BillingController::class, 'cancel'])->name('cancel');
@@ -93,4 +93,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])->name('stripe.webhook');
-Route::post('/mayar/webhook',  [BillingController::class, 'webhookMayar'])->name('mayar.webhook');
+Route::post('/midtrans/webhook', [BillingController::class, 'webhookMidtrans'])->name('midtrans.webhook');

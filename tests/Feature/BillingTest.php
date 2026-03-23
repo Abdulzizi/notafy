@@ -12,89 +12,98 @@ class BillingTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function mayarPayload(string $transactionId = 'TXN-001', int $amount = 29000): array
+    private string $serverKey = 'test-server-key';
+
+    protected function setUp(): void
     {
+        parent::setUp();
+        Config::set('services.midtrans.server_key', $this->serverKey);
+    }
+
+    private function midtransPayload(string $orderId = 'INV-STARTER-001', int $amount = 29000, string $email = 'buyer@example.com', string $status = 'settlement'): array
+    {
+        $grossAmount = number_format($amount, 2, '.', '');
+        $statusCode  = '200';
+
         return [
-            'event'  => 'payment.success',
-            'id'     => $transactionId,
-            'data'   => [
-                'id'            => $transactionId,
-                'customerEmail' => 'buyer@example.com',
-                'amount'        => $amount,
-            ],
+            'order_id'           => $orderId,
+            'status_code'        => $statusCode,
+            'gross_amount'       => $grossAmount,
+            'transaction_status' => $status,
+            'signature_key'      => hash('sha512', $orderId . $statusCode . $grossAmount . $this->serverKey),
+            'customer_details'   => ['email' => $email],
         ];
     }
 
-    private function signedMayarRequest(array $payload): \Illuminate\Testing\TestResponse
-    {
-        $secret    = 'test-secret';
-        Config::set('services.mayar.webhook_secret', $secret);
-        $body      = json_encode($payload);
-        $signature = hash_hmac('sha256', $body, $secret);
-
-        return $this->withHeaders(['X-Mayar-Signature' => $signature])
-            ->postJson('/mayar/webhook', $payload);
-    }
-
-    public function test_mayar_webhook_grants_starter_credits(): void
+    public function test_midtrans_webhook_grants_starter_credits(): void
     {
         $user = User::factory()->create([
             'email'   => 'buyer@example.com',
             'credits' => 0,
         ]);
 
-        $this->signedMayarRequest($this->mayarPayload('TXN-001', 29000));
+        $this->postJson('/midtrans/webhook', $this->midtransPayload('INV-STARTER-001', 29000));
 
         $this->assertEquals(200, $user->fresh()->credits);
     }
 
-    public function test_mayar_webhook_grants_pro_credits(): void
+    public function test_midtrans_webhook_grants_pro_credits(): void
     {
         $user = User::factory()->create([
             'email'   => 'buyer@example.com',
             'credits' => 0,
         ]);
 
-        $this->signedMayarRequest($this->mayarPayload('TXN-002', 99000));
+        $this->postJson('/midtrans/webhook', $this->midtransPayload('INV-PRO-001', 99000));
 
         $this->assertEquals(1000, $user->fresh()->credits);
     }
 
-    public function test_mayar_webhook_is_idempotent(): void
+    public function test_midtrans_webhook_is_idempotent(): void
     {
         $user = User::factory()->create([
             'email'   => 'buyer@example.com',
             'credits' => 0,
         ]);
 
-        $payload = $this->mayarPayload('TXN-DUPE', 29000);
+        $payload = $this->midtransPayload('INV-DUPE-001', 29000);
 
-        $this->signedMayarRequest($payload);
-        $this->signedMayarRequest($payload); // replay
+        $this->postJson('/midtrans/webhook', $payload);
+        $this->postJson('/midtrans/webhook', $payload); // replay
 
-        // Credits should only be added once
         $this->assertEquals(200, $user->fresh()->credits);
         $this->assertDatabaseCount('credit_transactions', 1);
     }
 
-    public function test_mayar_webhook_rejects_invalid_signature(): void
+    public function test_midtrans_webhook_rejects_invalid_signature(): void
     {
-        Config::set('services.mayar.webhook_secret', 'real-secret');
+        $payload = $this->midtransPayload();
+        $payload['signature_key'] = 'invalidsignature';
 
-        $response = $this->withHeaders(['X-Mayar-Signature' => 'bad-sig'])
-            ->postJson('/mayar/webhook', $this->mayarPayload());
+        $response = $this->postJson('/midtrans/webhook', $payload);
 
         $response->assertStatus(401);
     }
 
-    public function test_mayar_webhook_ignores_unknown_email(): void
+    public function test_midtrans_webhook_ignores_unknown_email(): void
     {
-        $payload = $this->mayarPayload();
-        $payload['data']['customerEmail'] = 'nobody@example.com';
-
-        $response = $this->signedMayarRequest($payload);
+        $response = $this->postJson('/midtrans/webhook',
+            $this->midtransPayload('INV-NOUSER-001', 29000, 'nobody@example.com')
+        );
 
         $response->assertStatus(200);
         $this->assertDatabaseCount('credit_transactions', 0);
+    }
+
+    public function test_midtrans_webhook_ignores_non_settlement_status(): void
+    {
+        $user = User::factory()->create([
+            'email'   => 'buyer@example.com',
+            'credits' => 0,
+        ]);
+
+        $this->postJson('/midtrans/webhook', $this->midtransPayload('INV-PENDING-001', 29000, 'buyer@example.com', 'pending'));
+
+        $this->assertEquals(0, $user->fresh()->credits);
     }
 }
