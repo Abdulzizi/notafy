@@ -17,8 +17,8 @@
         [
             'title' => 'Credits',
             'items' => [
-                ['q' => 'How do credits work?', 'a' => 'Each extraction costs 1 credit. Free accounts get 10 credits every Monday. Purchased credits never expire and are added on top of your current balance.'],
-                ['q' => 'What happens to my credits when they reset?', 'a' => 'The weekly reset on the free plan sets your balance back to 10 — it does not add 10 on top. If you have purchased credits, those are not affected by the reset; the reset only applies to free-plan users.'],
+                ['q' => 'How do credits work?', 'a' => 'Each extraction costs 1 credit. Free accounts get 10 credits on the 1st of each month. Purchased credits never expire and are added on top of your current balance.'],
+                ['q' => 'What happens to my credits when they reset?', 'a' => 'The monthly reset on the free plan sets your balance back to 10. It does not add 10 on top. If you have purchased credits, those are not affected by the reset. The reset only applies to free-plan users.'],
                 ['q' => 'What if an extraction fails?', 'a' => 'If the extraction fails due to a processing error on our end, your credit is automatically refunded. You can see this in your account transaction history.'],
                 ['q' => 'Can I get a refund for unused credits?', 'a' => 'No. All credit purchases are final. Please refer to our Terms of Service.'],
             ],
@@ -46,7 +46,7 @@
             'items' => [
                 ['q' => 'Can I sign in with Google?', 'a' => 'Yes. You can register and sign in with your Google account. If you originally registered with email and password, you can also link Google from your account settings.'],
                 ['q' => 'Why do I need to verify my email?', 'a' => 'Email verification confirms your identity and ensures we can reach you for important account updates or password resets.'],
-                ['q' => 'How do I delete my account?', 'a' => 'Email us at support@notafy.id and we will permanently delete your account and all associated data within 7 business days.'],
+                ['q' => 'How do I delete my account?', 'a' => 'You can delete your account directly from your account settings page. It will ask you to confirm before anything is removed.'],
             ],
         ],
         [

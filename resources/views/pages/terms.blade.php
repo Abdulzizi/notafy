@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Terms of Service')
-@section('description', 'Terms of Service for Notafy — read before using our receipt OCR service.')
+@section('description', 'Terms of Service for Notafy. Read before using our receipt OCR service.')
 
 @section('content')
 <main style="max-width:760px;margin:0 auto;padding:6rem 1.5rem 4rem;">
@@ -23,7 +23,7 @@
         <p>You must provide a valid email address and keep your account credentials secure. You are responsible for all activity that occurs under your account. You must be at least 13 years old to use this service.</p>
 
         <h2 style="font-size:1.1rem;font-weight:600;color:var(--text);margin:2.5rem 0 0.75rem;">3. Credits</h2>
-        <p>Credits are consumed when you process a file (1 credit per extraction). Free accounts receive 10 credits each week. Purchased credit packs are one-time payments with no expiry date.</p>
+        <p>Credits are consumed when you process a file (1 credit per extraction). Free accounts receive 10 credits each month. Purchased credit packs are one-time payments with no expiry date.</p>
         <p style="margin-top:0.75rem;"><strong style="color:var(--text);">No refunds.</strong> All credit purchases are final. We do not offer refunds for unused credits under any circumstances.</p>
 
         <h2 style="font-size:1.1rem;font-weight:600;color:var(--text);margin:2.5rem 0 0.75rem;">4. Acceptable Use</h2>

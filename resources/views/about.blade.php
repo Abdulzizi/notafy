@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'About')
-@section('description', 'Notafy reads your receipts so you don\'t have to. Built for Indonesian expense tracking.')
+@section('description', 'Notafy reads receipts so you do not have to. Built for anyone tired of retyping expense data.')
 
 @section('content')
     <div class="about-page">
@@ -11,12 +11,12 @@
             <div class="about-fullbleed-inner">
                 <div class="section-label">About</div>
                 <blockquote class="about-quote">
-                    Receipts are everywhere.<br>
+                    Receipts pile up.<br>
                     <em>We read them for you.</em>
                 </blockquote>
                 <p class="about-quote-sub">
-                    A clean, fast interface on top of Mistral OCR.<br>
-                    Built for finance teams and anyone who hates retyping receipts.
+                    A clean interface on top of Mistral OCR.<br>
+                    Built for finance teams, freelancers, and anyone tired of retyping.
                 </p>
             </div>
         </section>
@@ -47,7 +47,7 @@
             <div class="about-content-grid">
                 <h2 class="about-section-heading">Why</h2>
                 <div class="about-content-right">
-                    <p>Receipts are trapped in photos every day — from e-commerce, food delivery, and retail. Extracting the text shouldn't mean manual retyping or expensive enterprise software.</p>
+                    <p>Receipts get trapped in photos every day. From e-commerce to food delivery to retail, the text is there but locked away. Getting it out should not mean manual retyping or expensive enterprise tools.</p>
                 </div>
             </div>
 
@@ -59,21 +59,21 @@
                             <span class="about-step-n">01</span>
                             <div>
                                 <strong>Upload</strong>
-                                <p>Drop a receipt photo or PDF. Stored privately in your account.</p>
+                                <p>Drop a receipt photo or PDF. It is stored privately in your account and never shared.</p>
                             </div>
                         </div>
                         <div class="about-step-minimal">
                             <span class="about-step-n">02</span>
                             <div>
                                 <strong>Process</strong>
-                                <p>Mistral AI reads the file and extracts structured text. PDFs are converted page by page.</p>
+                                <p>Mistral AI reads the file and returns structured text. Multi-page PDFs are handled page by page.</p>
                             </div>
                         </div>
                         <div class="about-step-minimal">
                             <span class="about-step-n">03</span>
                             <div>
                                 <strong>Copy</strong>
-                                <p>Text is saved to your history and ready to copy in one click.</p>
+                                <p>The result is saved to your history and ready to copy or download with one click.</p>
                             </div>
                         </div>
                     </div>

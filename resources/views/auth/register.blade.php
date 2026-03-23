@@ -4,13 +4,13 @@
 @section('description', 'Create a free Notafy account and start extracting structured data from your receipts with AI.')
 
 @section('panel-quote')
-    Start fresh. <em>Your account, your space.</em>
+    Start here. <em>Your receipts, organized from day one.</em>
 @endsection
 
 @section('content')
     <div class="card-heading">
-        <h1>Create account</h1>
-        <p>Fill in the details below to get started.</p>
+        <h1>Create your account</h1>
+        <p>Takes less than a minute.</p>
     </div>
 
     <form method="POST" action="{{ route('register.store') }}">

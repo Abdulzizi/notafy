@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Pricing')
-@section('description', 'Simple credit-based pricing. Start free with 10 credits per week. Buy more anytime.')
+@section('title', 'Pricing — Notafy')
+@section('description', 'Start free with 10 credits a month. Buy a credit pack when you need more. No subscriptions.')
 
 @section('content')
 <div class="pricing-page">
     <div class="pricing-header">
-        <h1 class="pricing-title">Simple, credit-based pricing</h1>
-        <p class="pricing-subtitle">Every extraction costs 1 credit. Credits reset automatically each period.</p>
+        <h1 class="pricing-title">One credit per receipt. That is it.</h1>
+        <p class="pricing-subtitle">Buy a pack once, use it whenever you need. No subscriptions, no surprise charges.</p>
     </div>
 
     <div class="pricing-cards">
@@ -15,11 +15,11 @@
         <div class="pricing-card">
             <div class="pricing-plan-name">Free</div>
             <div class="pricing-credits">10</div>
-            <div class="pricing-credits-label">credits / week</div>
+            <div class="pricing-credits-label">credits / month</div>
             <div class="pricing-price">Rp 0</div>
             <ul class="pricing-features">
-                <li>10 extractions per week</li>
-                <li>Resets every Monday</li>
+                <li>10 extractions per month</li>
+                <li>Resets on the 1st of each month</li>
                 <li>Mistral OCR engine</li>
                 <li>Full structured JSON output</li>
             </ul>
@@ -39,7 +39,7 @@
                 <li>Full structured JSON output</li>
             </ul>
             <a href="{{ route('checkout', 'starter') }}" class="ocr-submit" style="display:block;text-align:center;text-decoration:none;">
-                Buy Now
+                Get Starter
             </a>
         </div>
 
@@ -54,7 +54,7 @@
                 <li>Full structured JSON output</li>
             </ul>
             <a href="{{ route('checkout', 'pro') }}" class="ocr-submit" style="display:block;text-align:center;text-decoration:none;">
-                Buy Now
+                Get Pro
             </a>
         </div>
 
