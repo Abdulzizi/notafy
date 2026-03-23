@@ -7,15 +7,6 @@ use App\Services\MistralOcrService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-/**
- * Handles receipt OCR history, result viewing, and file serving for Notafy.
- *
- * Extraction is handled by ExtractController + MistralOcrService.
- * This controller manages: result display, history, rerun, destroy, download.
- *
- * Supported platforms: Shopee, Tokopedia, GoFood, GoCar, GoRide,
- * GrabFood, GrabBike, GrabCar, Indomaret, nota warung.
- */
 class OcrController extends Controller
 {
     public function index()
@@ -30,21 +21,18 @@ class OcrController extends Controller
 
     public function upload(Request $request)
     {
-        // Legacy route — kept for any existing form submissions.
-        // New extractions should go through POST /extract (ExtractController).
         return redirect()->route('extract.index');
     }
 
-
     public function result(OcrResult $ocr)
     {
-        abort_if($ocr->user_id !== auth()->id(), 403);
+        $ocr->authorizeOwner();
         return view('ocr.result', compact('ocr'));
     }
 
     public function rerun(OcrResult $ocr)
     {
-        abort_if($ocr->user_id !== auth()->id(), 403);
+        $ocr->authorizeOwner();
         abort_if($ocr->status !== 'done', 422);
 
         $user = auth()->user();
@@ -58,12 +46,9 @@ class OcrController extends Controller
 
         try {
             $service = app(MistralOcrService::class);
-            // Re-run using the already-stored file path directly
             $fullPath = Storage::disk('local')->path($ocr->file_path);
-            $apiKey   = config('services.mistral.key');
 
-            // Re-use service internals via a fresh extract on the stored file
-            $tmpFile  = new \Illuminate\Http\UploadedFile(
+            $tmpFile = new \Illuminate\Http\UploadedFile(
                 $fullPath,
                 $ocr->filename,
                 null,
@@ -72,7 +57,6 @@ class OcrController extends Controller
             );
             $updated = $service->extract($tmpFile, $user->id);
 
-            // Copy results back to original record, delete the duplicate
             $ocr->update(array_merge(
                 $updated->only([
                     'extracted_text', 'platform', 'category', 'transaction_id',
@@ -84,7 +68,7 @@ class OcrController extends Controller
             ));
             $updated->delete();
         } catch (\Throwable $e) {
-            $user->increment('credits'); // refund on failure
+            $user->increment('credits');
             $ocr->update(['status' => 'done']);
             \Log::error('Rerun failed: ' . $e->getMessage());
             return back()->withErrors(['rerun' => 'Processing failed. Credit refunded.']);
@@ -96,11 +80,8 @@ class OcrController extends Controller
 
     public function destroy(OcrResult $ocr)
     {
-        abort_if($ocr->user_id !== auth()->id(), 403);
-        Storage::disk('local')->delete($ocr->file_path);
-        if ($ocr->preview_path) {
-            Storage::disk('local')->delete($ocr->preview_path);
-        }
+        $ocr->authorizeOwner();
+        $ocr->deleteFiles();
         $ocr->delete();
         return redirect()->route('ocr.index')->with('status', 'Nota dihapus.');
     }
@@ -119,7 +100,7 @@ class OcrController extends Controller
 
     public function serveFile(OcrResult $ocr)
     {
-        abort_if($ocr->user_id !== auth()->id(), 403);
+        $ocr->authorizeOwner();
         $path = Storage::disk('local')->path($ocr->file_path);
         abort_if(!file_exists($path), 404);
         return response()->file($path);
@@ -127,7 +108,7 @@ class OcrController extends Controller
 
     public function servePreview(OcrResult $ocr)
     {
-        abort_if($ocr->user_id !== auth()->id(), 403);
+        $ocr->authorizeOwner();
         abort_if(!$ocr->preview_path, 404);
         $path = Storage::disk('local')->path($ocr->preview_path);
         abort_if(!file_exists($path), 404);
@@ -136,7 +117,7 @@ class OcrController extends Controller
 
     public function download(OcrResult $ocr, string $format)
     {
-        abort_if($ocr->user_id !== auth()->id(), 403);
+        $ocr->authorizeOwner();
         abort_unless(auth()->user()->isPro(), 403);
         abort_unless(in_array($format, ['txt', 'pdf']), 404);
 
@@ -148,7 +129,6 @@ class OcrController extends Controller
                 ->header('Content-Disposition', "attachment; filename=\"{$filename}.txt\"");
         }
 
-        // PDF
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('ocr.download-pdf', compact('ocr'));
         return $pdf->download("{$filename}.pdf");
     }
