@@ -10,6 +10,12 @@
         <p class="pricing-subtitle">Buy a pack once, use it whenever you need. No subscriptions, no surprise charges.</p>
     </div>
 
+    @unless(config('app.payments_enabled'))
+    <div style="margin:0 auto 2rem;max-width:620px;padding:1rem 1.25rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;text-align:center;font-size:0.9rem;color:var(--muted);">
+        Paid plans are <strong style="color:var(--text);">coming soon</strong> — our payment system is currently being reviewed. The free plan is fully available right now.
+    </div>
+    @endunless
+
     <div class="pricing-cards">
 
         <div class="pricing-card">
@@ -28,7 +34,7 @@
             </a>
         </div>
 
-        <div class="pricing-card">
+        <div class="pricing-card" style="{{ config('app.payments_enabled') ? '' : 'opacity:0.5;pointer-events:none;' }}">
             <div class="pricing-plan-name">Starter Pack</div>
             <div class="pricing-credits">200</div>
             <div class="pricing-credits-label">credits</div>
@@ -38,12 +44,12 @@
                 <li>Mistral OCR engine</li>
                 <li>Full structured JSON output</li>
             </ul>
-            <a href="{{ route('checkout', 'starter') }}" class="ocr-submit" style="display:block;text-align:center;text-decoration:none;">
-                Get Starter
-            </a>
+            <span class="ocr-submit" style="display:block;text-align:center;">
+                {{ config('app.payments_enabled') ? 'Get Starter' : 'Coming Soon' }}
+            </span>
         </div>
 
-        <div class="pricing-card pricing-card--featured">
+        <div class="pricing-card pricing-card--featured" style="{{ config('app.payments_enabled') ? '' : 'opacity:0.5;pointer-events:none;' }}">
             <div class="pricing-plan-name">Pro Pack</div>
             <div class="pricing-credits">1000</div>
             <div class="pricing-credits-label">credits</div>
@@ -53,9 +59,9 @@
                 <li>Mistral OCR engine</li>
                 <li>Full structured JSON output</li>
             </ul>
-            <a href="{{ route('checkout', 'pro') }}" class="ocr-submit" style="display:block;text-align:center;text-decoration:none;">
-                Get Pro
-            </a>
+            <span class="ocr-submit" style="display:block;text-align:center;">
+                {{ config('app.payments_enabled') ? 'Get Pro' : 'Coming Soon' }}
+            </span>
         </div>
 
     </div>

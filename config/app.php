@@ -15,6 +15,8 @@ return [
 
     'name' => env('APP_NAME', 'Notafy'),
 
+    'payments_enabled' => env('PAYMENTS_ENABLED', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment
