@@ -27,6 +27,7 @@ Route::get('/about',   fn() => view('about'))->name('about');
 Route::get('/pricing', [PricingController::class, 'index'])->name('pricing');
 Route::get('/terms',   fn() => view('pages.terms'))->name('terms');
 Route::get('/privacy', fn() => view('pages.privacy'))->name('privacy');
+Route::get('/refund',  fn() => view('pages.refund'))->name('refund');
 Route::get('/contact', fn() => view('pages.contact'))->name('contact');
 Route::get('/faq',     fn() => view('pages.faq'))->name('faq');
 Route::get('/checkout/{plan}', [CheckoutController::class, 'show'])->name('checkout')->middleware('auth');

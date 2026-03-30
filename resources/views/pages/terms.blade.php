@@ -24,7 +24,7 @@
 
         <h2 style="font-size:1.1rem;font-weight:600;color:var(--text);margin:2.5rem 0 0.75rem;">3. Credits</h2>
         <p>Credits are consumed when you process a file (1 credit per extraction). Free accounts receive 10 credits each month. Purchased credit packs are one-time payments with no expiry date.</p>
-        <p style="margin-top:0.75rem;"><strong style="color:var(--text);">No refunds.</strong> All credit purchases are final. We do not offer refunds for unused credits under any circumstances.</p>
+        <p style="margin-top:0.75rem;">Credits consumed in extractions are non-refundable. Unused credits from a pack may be refunded within 7 days of purchase if none of the pack's credits have been used. See our <a href="{{ route('refund') }}" style="color:var(--accent);">Refund Policy</a> for details and how to submit a request.</p>
 
         <h2 style="font-size:1.1rem;font-weight:600;color:var(--text);margin:2.5rem 0 0.75rem;">4. Acceptable Use</h2>
         <p>You agree not to:</p>

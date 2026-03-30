@@ -12,6 +12,7 @@
     <div class="footer-links" style="margin-top:0.25rem;">
         <a href="{{ route('terms') }}" style="font-size:0.8rem;color:var(--muted);">Terms</a>
         <a href="{{ route('privacy') }}" style="font-size:0.8rem;color:var(--muted);">Privacy</a>
+        <a href="{{ route('refund') }}" style="font-size:0.8rem;color:var(--muted);">Refund Policy</a>
     </div>
     <div class="footer-copy">&copy; {{ date('Y') }} {{ config('app.name') }}</div>
 </footer>
