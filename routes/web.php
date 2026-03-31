@@ -4,14 +4,13 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\ExtractController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\OcrController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\ResultController;
-use App\Http\Controllers\StripeWebhookController;
-
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -67,10 +66,8 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('billing')->name('billing.')->group(function () {
-        Route::get('/checkout/stripe',    [BillingController::class, 'checkoutStripe'])->name('checkout.stripe');
         Route::get('/checkout/midtrans',  [BillingController::class, 'checkoutMidtrans'])->name('checkout.midtrans');
         Route::get('/success',           [BillingController::class, 'success'])->name('success');
-        Route::get('/portal',            [BillingController::class, 'portal'])->name('portal');
         Route::get('/cancel',            [BillingController::class, 'cancel'])->name('cancel');
     });
 });
@@ -82,6 +79,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('extract.submit');
 
     Route::get('/history', [HistoryController::class, 'index'])->name('history');
+    Route::get('/history/export', [ExportController::class, 'history'])->name('history.export');
 
     Route::get('/result/{ocr}', [ResultController::class, 'show'])->name('result.show');
     Route::delete('/result/{ocr}', [ResultController::class, 'destroy'])->name('result.destroy');
@@ -103,5 +101,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/credits/insufficient', fn() => view('pages.insufficient-credits'))->name('credits.insufficient');
 });
 
-Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])->name('stripe.webhook');
 Route::post('/midtrans/webhook', [BillingController::class, 'webhookMidtrans'])->name('midtrans.webhook');

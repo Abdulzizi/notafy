@@ -12,12 +12,12 @@ class HistoryController extends Controller
 
         $query = OcrResult::where('user_id', $user->id)->latest();
 
-        if (!$user->isPro()) {
+        if (!$user->isStarter()) {
             $query->take(30);
         }
 
         $results = $query->paginate(15);
-        $historyLimited = !$user->isPro();
+        $historyLimited = !$user->isStarter();
 
         return view('pages.history', compact('results', 'historyLimited'));
     }

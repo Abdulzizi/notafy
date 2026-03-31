@@ -8,41 +8,6 @@ use Illuminate\Http\Request;
 
 class BillingController extends Controller
 {
-    public function checkoutStripe(Request $request)
-    {
-        $pack = $request->query('pack', 'pro');
-
-        $priceId = match ($pack) {
-            'starter' => config('cashier.starter_price_id'),
-            default   => config('cashier.pro_price_id'),
-        };
-
-        abort_unless($priceId, 500, 'Stripe price ID not configured for this pack.');
-
-        $user = $request->user();
-
-        // One-time payment session with metadata so the webhook knows who paid and for what
-        return $user->checkout($priceId, [
-            'success_url' => route('billing.success') . '?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url'  => route('billing.cancel'),
-            'payment_intent_data' => [
-                'metadata' => [
-                    'user_id' => $user->id,
-                    'pack'    => $pack,
-                ],
-            ],
-            'metadata' => [
-                'user_id' => $user->id,
-                'pack'    => $pack,
-            ],
-        ]);
-    }
-
-    public function portal(Request $request)
-    {
-        return $request->user()->redirectToBillingPortal(route('extract.index'));
-    }
-
     public function checkoutMidtrans(Request $request)
     {
         $pack   = $request->query('pack', 'pro');
@@ -64,7 +29,7 @@ class BillingController extends Controller
                     'id'       => $pack,
                     'price'    => $amount,
                     'quantity' => 1,
-                    'name'     => ucfirst($pack) . ' Pack',
+                    'name'     => ucfirst($pack) . ' — 1 Month',
                 ],
             ],
             'customer_details' => [
@@ -138,41 +103,49 @@ class BillingController extends Controller
             return response('ok');
         }
 
-        $amount  = (int) round((float) $grossAmount);
-        $credits = $this->creditsFromAmount($amount);
+        $amount = (int) round((float) $grossAmount);
+        $pack   = $this->packFromAmount($amount);
 
-        if ($credits > 0) {
-            $pack = $credits === 200 ? 'Starter' : 'Pro';
-            $user->increment('credits', $credits, [
-                'plan'                    => strtolower($pack),
-                'credits_last_refilled_at' => now(),
-            ]);
-            CreditTransaction::record(
-                $user->id,
-                'purchase',
-                $credits,
-                "{$pack} Pack — Midtrans",
-                $orderId,
-            );
-            \Log::info("Midtrans: added {$credits} credits to user {$user->id}");
+        if (!$pack) {
+            \Log::warning('Midtrans webhook: unrecognised amount', ['amount' => $amount]);
+            return response('ok');
         }
+
+        $credits = $pack === 'starter' ? 200 : 1000;
+
+        $user->update([
+            'plan'                    => $pack,
+            'billing_gateway'         => 'midtrans',
+            'subscription_expires_at' => now()->addMonth(),
+            'credits'                 => $credits,
+            'credits_last_refilled_at' => now(),
+        ]);
+
+        CreditTransaction::record(
+            $user->id,
+            'purchase',
+            $credits,
+            ucfirst($pack) . ' subscription — Midtrans',
+            $orderId,
+        );
+
+        \Log::info("Midtrans: activated {$pack} subscription for user {$user->id}");
 
         return response('ok');
     }
 
-    private function creditsFromAmount(int $amount): int
+    private function packFromAmount(int $amount): ?string
     {
-        // Rp 29.000 → 200 credits (starter), Rp 99.000 → 1000 credits (pro)
-        // Allow ±10% tolerance for gateway fees
-        if ($amount >= 26100 && $amount <= 31900) return 200;
-        if ($amount >= 89100 && $amount <= 108900) return 1000;
-        return 0;
+        // Rp 29.000 → starter, Rp 99.000 → pro (±10% tolerance for gateway fees)
+        if ($amount >= 26100 && $amount <= 31900) return 'starter';
+        if ($amount >= 89100 && $amount <= 108900) return 'pro';
+        return null;
     }
 
     public function success(Request $request)
     {
         return redirect()->route('extract.index')
-            ->with('status', 'Payment successful! Credits have been added to your account.');
+            ->with('status', 'Payment successful! Your subscription is now active.');
     }
 
     public function cancel(Request $request)
