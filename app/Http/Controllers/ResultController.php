@@ -25,7 +25,7 @@ class ResultController extends Controller
     public function download(OcrResult $ocr, string $format)
     {
         $ocr->authorizeOwner();
-        abort_unless(auth()->user()->isPro(), 403);
+        abort_unless(auth()->user()->isStarter(), 403);
         abort_unless(in_array($format, ['txt', 'pdf']), 404);
 
         $filename = pathinfo($ocr->filename, PATHINFO_FILENAME);

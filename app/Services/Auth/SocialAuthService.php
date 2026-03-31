@@ -46,6 +46,7 @@ class SocialAuthService
                 'name'                    => $name,
                 'email'                   => $email,
                 'password'                => Str::random(32),
+                'email_verified_at'       => now(),
                 'credits'                 => 10,
                 'credits_last_refilled_at' => now(),
             ]);

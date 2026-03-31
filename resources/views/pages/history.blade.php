@@ -15,13 +15,49 @@
                     @endif
                 </p>
             </div>
-            <a href="{{ route('extract.index') }}" class="hero-cta">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-                New Receipt
-            </a>
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+                @if(auth()->user()->isStarter())
+                    <a href="{{ route('history.export', ['format' => 'csv']) }}"
+                       class="hero-cta"
+                       style="background:var(--surface);border:1px solid var(--border);color:var(--text);gap:0.4rem;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        CSV
+                    </a>
+                    @if(auth()->user()->isPro())
+                        <a href="{{ route('history.export', ['format' => 'xlsx']) }}"
+                           class="hero-cta"
+                           style="background:var(--surface);border:1px solid var(--border);color:var(--text);gap:0.4rem;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Excel
+                        </a>
+                    @endif
+                @else
+                    <a href="{{ route('pricing') }}"
+                       title="Upgrade to export"
+                       style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.5rem 0.9rem;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.85rem;text-decoration:none;cursor:pointer;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                        Export
+                    </a>
+                @endif
+                <a href="{{ route('extract.index') }}" class="hero-cta">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    New Receipt
+                </a>
+            </div>
         </div>
 
         @if ($results->isEmpty())
